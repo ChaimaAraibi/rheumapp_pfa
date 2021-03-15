@@ -2,6 +2,7 @@
 
 
 ## to get all patients:
+
 get: localhost:4000/
 {
     "_id": "604f47fdd696a00e6452ffbc",
@@ -17,9 +18,11 @@ get: localhost:4000/
 
 
 ## to get patient by id
+
 get: localhost:4000/:id
 
 ## to add a new patient (sign up)
+
 post: loaclhost:4000/add
 {
     "nom": "belhsan",
@@ -31,6 +34,7 @@ post: loaclhost:4000/add
 }
 
 ## to add a new score JADAS
+
 post: localhost:4000/newJADAS/:id
 {
   "score": 30
@@ -63,6 +67,7 @@ post: localhost:4000/newJADAS/:id
 }
   
 ## to update ordonnance
+
 post: localhost:4000/updateOrdonnance/:id
 {ordonnance: spondystop 3 fois oar jour}
 
