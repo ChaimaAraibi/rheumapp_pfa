@@ -20,5 +20,4 @@ mongoose.connect("mongodb+srv://chaima:bookrecsys123@cluster0-z4urb.gcp.mongodb.
         console.log('Database could not be connected: ' + error)
     }
 )
-//test comment
 app.use('/patients', patientRoutes);

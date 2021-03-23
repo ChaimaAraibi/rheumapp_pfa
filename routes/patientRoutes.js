@@ -1,4 +1,4 @@
-const { getAllPatients, getPatientById, addPatient, updateOrdonnance, addJADAS } = require("../queries/patientQueries") 
+const { getAllPatients, getPatientById, addPatient, updateOrdonnance, askforJADAS, validateJADAS, fillJADAS } = require("../queries/patientQueries") 
 const express = require('express')
 const patientRoutes = express.Router();
 
@@ -32,9 +32,26 @@ patientRoutes.route("/updateOrdonnance/:id").post((req,res)=>{
 });
 
 patientRoutes.route("/newJADAS/:id").post((req,res)=>{
-    addJADAS(
+    askforJADAS(
         req.params.id,
         req.query.score,
+        res
+        );
+});
+
+patientRoutes.route("/fillJADAS/:idp/:idj").post((req,res)=>{
+    fillJADAS(
+        req.params.idp,
+        req.params.idj,
+        req.query.score,
+        res
+        );
+});
+
+patientRoutes.route("/validJADAS/:idp/:idj").post((req,res)=>{
+    validateJADAS(
+        req.params.idp,
+        req.params.idj,
         res
         );
 });

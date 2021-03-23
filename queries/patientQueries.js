@@ -63,18 +63,16 @@ function updateOrdonnance(
     })
 }
 
-function addJADAS(
+function askforJADAS(
     id,
-    score,
     res
 ){
     
     patient.updateOne(
         {_id: id},
         {$push: {
-            JADAS: {
-                score: score, 
-                date: new Date(), 
+            JADAS: { 
+                dateDemande: new Date(), 
                 state: 0
             }
         }}, (err)=>{
@@ -87,9 +85,63 @@ function addJADAS(
     )
 }
 
+function fillJADAS(
+    idp,
+    idj,
+    score,
+    res
+){
+    
+    patient.updateOne(
+        {_id: idp,"JADAS._id": idj},
+        {$set: {
+            JADAS: {
+                score: score, 
+                dateCalcul: new Date(), 
+                state: 1
+            }
+        }}, (err)=>{
+            if (err) {
+                console.log(err);
+            } else {
+                res.json(patient);
+            }
+        }
+    )
+}
 
-module.exports.getAllPatients = getAllPatients
-module.exports.getPatientById = getPatientById
-module.exports.addPatient = addPatient
-module.exports.updateOrdonnance = updateOrdonnance
-module.exports.addJADAS = addJADAS
+
+
+function validateJADAS(
+    id,
+    idj,
+    res
+){
+    
+    patient.updateOne(
+        {_id: id, "JADAS._id": idj},
+        {$set: {
+            JADAS: { 
+                dateValidation: new Date(), 
+                state: 2
+            }
+        }}, (err)=>{
+            if (err) {
+                console.log(err);
+            } else {
+                res.json(patient);
+            }
+        }
+    )
+}
+
+
+module.exports.getAllPatients = getAllPatients,
+module.exports.getPatientById = getPatientById,
+module.exports.addPatient = addPatient,
+module.exports.updateOrdonnance = updateOrdonnance,
+module.exports.fillJADAS = fillJADAS,
+module.exports.askforJADAS = askforJADAS,
+module.exports.validateJADAS = validateJADAS
+
+
