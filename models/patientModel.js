@@ -32,10 +32,11 @@ let Patient = new Schema({
         state: Number // 0: demandé, 1: rempli, 2: validé
     }],
     Bilan: [{
-        type: String, // Hémoglobine , VGM , TCMH , Globules blancs , Polynucléaires neutrophiles , Lymphocyte  , Plaquettes , Vitesse de sédimentation , Protéine C réactive , ASAT , ALAT , GGT , PAL , Créatinine , Ferritinémie , ECBU , Sérologie hépatite C , Sérologie hépatite B 
+        type_bilan: String, // Hémoglobine , VGM , TCMH , Globules blancs , Polynucléaires neutrophiles , Lymphocyte  , Plaquettes , Vitesse de sédimentation , Protéine C réactive , ASAT , ALAT , GGT , PAL , Créatinine , Ferritinémie , ECBU , Sérologie hépatite C , Sérologie hépatite B 
         dateDemande: Date,
         dateSaisie: Date,
-        state: Number // 0: demandé, 1: done
+        state: Number, // 0: demandé, 1: done
+        bilan: String
     }],
 
 });

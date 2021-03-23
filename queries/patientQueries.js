@@ -110,8 +110,6 @@ function fillJADAS(
     )
 }
 
-
-
 function validateJADAS(
     id,
     idj,
@@ -135,6 +133,54 @@ function validateJADAS(
     )
 }
 
+function askforBILAN(
+    id,
+    type,
+    res
+){
+    
+    patient.updateOne(
+        {_id: id},
+        {$push: {
+            Bilan: { 
+                type_bilan: type,
+                dateDemande: new Date(), 
+                state: 0
+            }
+        }}, (err)=>{
+            if (err) {
+                console.log(err);
+            } else {
+                res.json(patient);
+            }
+        }
+    )
+}
+
+function fillBILAN(
+    idp,
+    idj,
+    path,
+    res
+){
+    
+    patient.updateOne(
+        {_id: idp,"JADAS._id": idj},
+        {$set: {
+            JADAS: { 
+                dateSaisie: new Date(), 
+                state: 1,
+                bilan:path
+            }
+        }}, (err)=>{
+            if (err) {
+                console.log(err);
+            } else {
+                res.json(patient);
+            }
+        }
+    )
+}
 
 module.exports.getAllPatients = getAllPatients,
 module.exports.getPatientById = getPatientById,
@@ -143,5 +189,7 @@ module.exports.updateOrdonnance = updateOrdonnance,
 module.exports.fillJADAS = fillJADAS,
 module.exports.askforJADAS = askforJADAS,
 module.exports.validateJADAS = validateJADAS
+module.exports.askforBILAN = askforBILAN
+module.exports.fillBILAN = fillBILAN
 
 
