@@ -3,7 +3,7 @@
 
 ## to get all patients:
 
-get: localhost:4000/
+get: localhost:4000/patients
 {
     "_id": "604f47fdd696a00e6452ffbc",
     "nom": "belhsan",
@@ -19,11 +19,11 @@ get: localhost:4000/
 
 ## to get patient by id
 
-get: localhost:4000/:id
+get: localhost:4000/patients/:id
 
 ## to add a new patient (sign up)
 
-post: loaclhost:4000/add
+post: loaclhost:4000/patients/add
 {
     "nom": "belhsan",
     "prenom": "imed",
@@ -35,7 +35,7 @@ post: loaclhost:4000/add
 
 ## to add a new score JADAS
 
-post: localhost:4000/newJADAS/:id
+post: localhost:4000/patients/newJADAS/:id
 {
   "score": 30
   }
@@ -68,7 +68,7 @@ post: localhost:4000/newJADAS/:id
   
 ## to update ordonnance
 
-post: localhost:4000/updateOrdonnance/:id
+post: localhost:4000/patients/updateOrdonnance/:id
 {ordonnance: spondystop 3 fois oar jour}
 
 resultat:
