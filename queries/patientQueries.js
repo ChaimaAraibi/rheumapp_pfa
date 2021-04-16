@@ -24,6 +24,7 @@ function getPatientById (id,res){
 function addPatient (
     nom,
     prenom,
+    date_naissance,
     telephone,
     num_dossier,
     diagnostic,
@@ -33,6 +34,7 @@ function addPatient (
     let newpatient = new patient ({
         nom: nom,
         prenom: prenom, 
+        date_naissance: date_naissance,
         telephone: telephone,
         num_dossier: num_dossier, 
         diagnostic: diagnostic, 
@@ -65,6 +67,7 @@ function updateOrdonnance(
 
 function askforJADAS(
     id,
+    date,
     res
 ){
     
@@ -72,7 +75,7 @@ function askforJADAS(
         {_id: id},
         {$push: {
             JADAS: { 
-                dateDemande: new Date(), 
+                dateDemande: date, 
                 state: 0
             }
         }}, (err)=>{
@@ -136,6 +139,7 @@ function validateJADAS(
 function askforBILAN(
     id,
     type,
+    date,
     res
 ){
     
@@ -144,7 +148,7 @@ function askforBILAN(
         {$push: {
             Bilan: { 
                 type_bilan: type,
-                dateDemande: new Date(), 
+                dateDemande: date, 
                 state: 0
             }
         }}, (err)=>{

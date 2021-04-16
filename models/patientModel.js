@@ -9,6 +9,9 @@ let Patient = new Schema({
         type: String,
         required: true
     },
+    date_naissance: {
+        type: Date
+    },
     telephone: {
         type: Number
     },

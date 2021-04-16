@@ -47,6 +47,7 @@ patientRoutes.route("/add").post((req,res)=>{
     addPatient(
         req.query.nom,
         req.query.prenom,
+        req.query.date_naissance,
         req.query.telephone,
         req.query.num_dossier,
         req.query.diagnostic,
@@ -65,6 +66,7 @@ patientRoutes.route("/updateOrdonnance/:id").post((req,res)=>{
 patientRoutes.route("/newJADAS/:id").post((req,res)=>{
     askforJADAS(
         req.params.id,
+        req.query.date,
         res
         );
 });
@@ -90,6 +92,7 @@ patientRoutes.route("/newBilan/:id").post((req,res)=>{
     askforBILAN(
         req.params.id,
         req.query.type,
+        req.query.date,
         res
         );
 });
