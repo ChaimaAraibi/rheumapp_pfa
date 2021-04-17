@@ -45,6 +45,25 @@ const upload = multer({
 patientRoutes.route("/:id").get((req, res) => {
   getPatientById(req.params.id, res);
 });
+=======
+
+
+patientRoutes.route("/:id").get((req,res)=>{
+    getPatientById(req.params.id,res);
+});
+
+
+
+
+patientRoutes.route("/fillJADAS/:idp/:idj").post((req,res)=>{
+    fillJADAS(
+        req.params.idp,
+        req.params.idj,
+        req.query.score,
+        res
+        );
+});
+
 
 patientRoutes.route("/fillJADAS/:idp/:idj").post((req, res) => {
   fillJADAS(req.params.idp, req.params.idj, req.query.score, res);

@@ -5,6 +5,7 @@ const doctorRoutes = require("./routes/doctorRoutes");
 const cors = require("cors");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config.env" });
+
 const PORT = 4000;
 app.use(cors());
 app.use(express.json());
@@ -38,3 +39,5 @@ mongoose
   );
 app.use("/patients", patientRoutes);
 app.use("/doctors", doctorRoutes);
+)
+
