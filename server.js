@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const patientRoutes = require ("./routes/patientRoutes");
+const doctorRoutes = require ("./routes/doctorRoutes");
 const cors = require('cors');
 const PORT = 4000;
 app.use(cors());
@@ -21,3 +22,4 @@ mongoose.connect("mongodb+srv://chaima:bookrecsys123@cluster0-z4urb.gcp.mongodb.
     }
 )
 app.use('/patients', patientRoutes);
+app.use('/doctor', doctorRoutes);
