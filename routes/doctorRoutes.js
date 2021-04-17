@@ -7,9 +7,9 @@ const {
   updateOrdonnance,
   askforJADAS,
   validateJADAS,
-  fillJADAS,
+  //fillJADAS,
   askforBILAN,
-  fillBILAN,
+  //fillBILAN,
 } = require("../queries/patientQueries");
 
 const doctorRoutes = express.Router();
@@ -44,7 +44,7 @@ const upload = multer({
 
 /* ************************************************************************************************ */
 
-doctorRoutes.route("/").get((req, res) => {
+doctorRoutes.route("/myPatients").get((req, res) => {
   getAllPatients(req, res);
 });
 
