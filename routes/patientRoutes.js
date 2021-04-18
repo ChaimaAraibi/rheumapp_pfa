@@ -45,7 +45,6 @@ const upload = multer({
 patientRoutes.route("/:id").get((req, res) => {
   getPatientById(req.params.id, res);
 });
-=======
 
 
 patientRoutes.route("/:id").get((req,res)=>{
