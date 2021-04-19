@@ -84,60 +84,41 @@ doctorRoutes.route("/newBilan/:id").post((req, res) => {
 doctorRoutes.post("/signup", doctorQueries.signup);
 doctorRoutes.post("/login", doctorQueries.login);
 
-doctorRoutes.route("/").get((req, res)=>{
-    getAllPatients(req,res)
-    
+doctorRoutes.route("/").get((req, res) => {
+  getAllPatients(req, res);
 });
 
-doctorRoutes.route("/:id").get((req,res)=>{
-    getPatientById(req.params.id,res);
+doctorRoutes.route("/:id").get((req, res) => {
+  getPatientById(req.params.id, res);
 });
 
-doctorRoutes.route("/add").post((req,res)=>{
-    addPatient(
-        req.query.nom,
-        req.query.prenom,
-        req.query.date_naissance,
-        req.query.telephone,
-        req.query.num_dossier,
-        req.query.diagnostic,
-        req.query.ordonnance,
-        res
-    );
+doctorRoutes.route("/add").post((req, res) => {
+  addPatient(
+    req.query.nom,
+    req.query.prenom,
+    req.query.date_naissance,
+    req.query.telephone,
+    req.query.num_dossier,
+    req.query.diagnostic,
+    req.query.ordonnance,
+    res
+  );
 });
 
-doctorRoutes.route("/updateOrdonnance/:id").post((req,res)=>{
-    updateOrdonnance(
-        req.params.id,
-        req.query.ordonnance,
-        res);
+doctorRoutes.route("/updateOrdonnance/:id").post((req, res) => {
+  updateOrdonnance(req.params.id, req.query.ordonnance, res);
 });
 
-doctorRoutes.route("/newJADAS/:id").post((req,res)=>{
-    askforJADAS(
-        req.params.id,
-        req.query.date,
-        res
-        );
+doctorRoutes.route("/newJADAS/:id").post((req, res) => {
+  askforJADAS(req.params.id, req.query.date, res);
 });
 
-
-doctorRoutes.route("/validJADAS/:idp/:idj").post((req,res)=>{
-    validateJADAS(
-        req.params.idp,
-        req.params.idj,
-        res
-        );
+doctorRoutes.route("/validJADAS/:idp/:idj").post((req, res) => {
+  validateJADAS(req.params.idp, req.params.idj, res);
 });
 
-doctorRoutes.route("/newBilan/:id").post((req,res)=>{
-    askforBILAN(
-        req.params.id,
-        req.query.type,
-        req.query.date,
-        res
-        );
+doctorRoutes.route("/newBilan/:id").post((req, res) => {
+  askforBILAN(req.params.id, req.query.type, req.query.date, res);
 });
-
 
 module.exports = doctorRoutes;
