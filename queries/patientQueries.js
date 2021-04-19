@@ -23,13 +23,7 @@ getAllPatients = catchAsync(async (req, res, next) => {
   const patients = await features.query;
 
   // SEND RESPONSE
-  res.status(200).json({
-    status: "success",
-    results: patients.length,
-    data: {
-      patients,
-    },
-  });
+  res.json(patient);
 });
 
 function getPatientById(id, res) {

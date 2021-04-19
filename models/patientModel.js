@@ -11,9 +11,11 @@ let Patient = new Schema({
   },
   date_naissance: {
     type: Date,
+    required: true,
   },
   telephone: {
     type: Number,
+    required: true,
   },
   num_dossier: {
     type: Number,
@@ -24,31 +26,72 @@ let Patient = new Schema({
     required: true,
   },
   ordonnance: {
-    type: String,
+    type: [String],
     required: true,
+    minItems: 0,
+    maxItems: 5,
   },
   JADAS: [
     {
-      score: Number,
+      score: String,
       dateDemande: Date,
       dateCalcul: Date,
       dateValidation: Date,
       state: Number, // 0: demandé, 1: rempli, 2: validé
     },
   ],
-  Bilan: [
+  JADAS: [
     {
-      type_bilan: String, // Hémoglobine , VGM , TCMH , Globules blancs , Polynucléaires neutrophiles , Lymphocyte  , Plaquettes , Vitesse de sédimentation , Protéine C réactive , ASAT , ALAT , GGT , PAL , Créatinine , Ferritinémie , ECBU , Sérologie hépatite C , Sérologie hépatite B
+      score: String,
       dateDemande: Date,
-      dateSaisie: Date,
-      state: Number, // 0: demandé, 1: done
-      bilan: String,
+      dateCalcul: Date,
+      dateValidation: Date,
+      state: Number, // 0: demandé, 1: rempli, 2: validé
     },
   ],
+  JSPADA: [
+    {
+      score: String,
+      dateDemande: Date,
+      dateCalcul: Date,
+      dateValidation: Date,
+      state: Number, // 0: demandé, 1: rempli, 2: validé
+    },
+  ],
+  CHAQ: [
+    {
+      score: String,
+      dateDemande: Date,
+      dateCalcul: Date,
+      dateValidation: Date,
+      state: Number, // 0: demandé, 1: rempli, 2: validé
+    },
+  ],
+  JAMAR: [
+    {
+      score: String,
+      dateDemande: Date,
+      dateCalcul: Date,
+      dateValidation: Date,
+      state: Number, // 0: demandé, 1: rempli, 2: validé
+    },
+  ],
+  Bilan: {
+    // type_bilan: String, // Hémoglobine , VGM , TCMH , Globules blancs , Polynucléaires neutrophiles , Lymphocyte  , Plaquettes , Vitesse de sédimentation , Protéine C réactive , ASAT , ALAT , GGT , PAL , Créatinine , Ferritinémie , ECBU , Sérologie hépatite C , Sérologie hépatite B
+    // dateDemande: Date,
+    // dateSaisie: Date,
+    // state: Number, // 0: demandé, 1: done
+    // bilan: String,
+    type_bilan: [String],
+    dateDemande: {
+      type: Date,
+      default: Date.now(),
+    },
+    state: Number, // 0: demandé, 1: done
+  },
   createdAt: {
     type: Date,
     default: Date.now(),
-    select: false,
   },
 });
 module.exports = mongoose.model("Patient", Patient);
