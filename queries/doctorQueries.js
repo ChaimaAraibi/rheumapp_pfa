@@ -22,8 +22,8 @@ exports.signup = catchAsync(async (req, res, next) => {
 });
 
 exports.login = catchAsync(async (req, res, next) => {
-  const mail = req.body.mail;
-  const cin = req.body.cin;
+  const mail = req.query.mail;
+  const cin = req.query.cin;
   // 1) Check if mail & password exists
   if (!mail || !cin) {
     return next(new AppError("Please provide email && cin", 400));
@@ -33,7 +33,6 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!doctor || !(await doctor.correctCin(cin, doctor.cin))) {
     return next(new AppError("incorrect email or cin", 401));
   }
-  //console.log(doctor);
   // 3) If everything ok, send token to client
   const token = signToken(doctor._id);
   res.status(200).json({
