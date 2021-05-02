@@ -31,15 +31,12 @@ let Patient = new Schema({
     minItems: 0,
     maxItems: 5,
   },
-  JADAS: [
-    {
-      score: String,
-      dateDemande: Date,
-      dateCalcul: Date,
-      dateValidation: Date,
-      state: Number, // 0: demandé, 1: rempli, 2: validé
-    },
-  ],
+  evaluation: {
+    type: String,
+  },
+  age: {
+    type: Number,
+  },
   JADAS: [
     {
       score: String,
@@ -61,6 +58,8 @@ let Patient = new Schema({
   CHAQ: [
     {
       score: String,
+      evaluation: String,
+      douleurs: String,
       dateDemande: Date,
       dateCalcul: Date,
       dateValidation: Date,
@@ -77,11 +76,6 @@ let Patient = new Schema({
     },
   ],
   Bilan: {
-    // type_bilan: String, // Hémoglobine , VGM , TCMH , Globules blancs , Polynucléaires neutrophiles , Lymphocyte  , Plaquettes , Vitesse de sédimentation , Protéine C réactive , ASAT , ALAT , GGT , PAL , Créatinine , Ferritinémie , ECBU , Sérologie hépatite C , Sérologie hépatite B
-    // dateDemande: Date,
-    // dateSaisie: Date,
-    // state: Number, // 0: demandé, 1: done
-    // bilan: String,
     type_bilan: [String],
     dateDemande: {
       type: Date,
