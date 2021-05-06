@@ -1,328 +1,446 @@
-const patient = require("../models/patientModel");
-const jwt_decode = require("jwt-decode");
+const Patient = require("../models/patientModel");
+const APIFeatures = require("./../utils/apiFeatures");
+const AppError = require("./../utils/appError");
 
-function getAuthorizedID(req) {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-  var decoded = jwt_decode(token);
-  console.log(decoded);
-  return decoded.id;
-}
+/////When signing up , the patient gets his data based on the id in the token
 
-function getAllPatients(req, res) {
-  //patient.find({_id:getAuthorizedID(req)}, function (err, patient) {
-  patient.find(function (err, patient) {
-    if (err) {
-      console.log(err);
-    } else {
-      res.json(patient);
+exports.getPatientById = async (req, res, next) => {
+  try {
+    if (!req.params.PId) req.params.PId = req.patient._id;
+    const patient = await Patient.findById(req.params.PId).populate({
+      path: "docteur",
+      select: "nom prenom",
+    });
+    res.json({
+      patient,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+/*************** filling scores************/
+
+//// Jadas
+
+exports.fillJADAS = async (req, res, next) => {
+  if (req.params.PId != req.patient.id) {
+    return next(
+      new AppError(
+        "You are not authorized to perform actions on other patients",
+        401
+      )
+    );
+  }
+  const patient = await Patient.findById(req.params.PId);
+  if (!patient.JADAS[0] || !patient.JADAS[0].state == 0) {
+    return next(new AppError("pas de chaq à remplir", 401));
+  }
+  patient.JADAS[0].dateCalcul = new Date();
+  patient.JADAS[0].state = 1;
+  patient.JADAS[0].score = req.body.score;
+  await patient.save();
+  res.json({
+    patient,
+  });
+};
+
+//// Jspada
+
+exports.fillJSPADA = async (req, res, next) => {
+  if (req.params.PId != req.patient.id) {
+    return next(
+      new AppError(
+        "You are not authorized to perform actions on other patients",
+        401
+      )
+    );
+  }
+  const patient = await Patient.findById(req.params.PId);
+  if (!patient.JSPADA[0] || !patient.JSPADA[0].state == 0) {
+    return next(new AppError("pas de jspada à remplir", 401));
+  }
+  patient.JSPADA[0].dateCalcul = new Date();
+  patient.JSPADA[0].state = 1;
+  patient.JSPADA[0].score = req.body.score;
+  await patient.save();
+  res.json({
+    patient,
+  });
+};
+
+/// Chaq
+
+exports.fillCHAQ = async (req, res, next) => {
+  if (req.params.PId != req.patient.id) {
+    return next(
+      new AppError(
+        "You are not authorized to perform actions on other patients",
+        401
+      )
+    );
+  }
+  const patient = await Patient.findById(req.params.PId);
+  if (!patient.CHAQ[0] || !patient.CHAQ[0].state == 0) {
+    return next(new AppError("pas de chaq à remplir", 401));
+  }
+  patient.CHAQ[0].dateCalcul = new Date();
+  patient.CHAQ[0].state = 1;
+  patient.CHAQ[0].score = req.body.score;
+  patient.CHAQ[0].douleurs = req.body.douleurs;
+  patient.CHAQ[0].evaluation = req.body.evaluation;
+  await patient.save();
+  res.json({
+    patient,
+  });
+};
+
+/// doctor gets all his patients
+
+exports.getAllPatients = async (req, res, next) => {
+  try {
+    if (!req.body.docteur) req.body.docteur = req.doctor.id;
+    if (req.params.docId != req.doctor.id) {
+      return next(
+        new AppError(
+          "You are not authorized to get other doctors patients",
+          401
+        )
+      );
     }
-  });
-}
+    const features = new APIFeatures(
+      Patient.find().where("docteur").equals(req.body.docteur),
+      req.query
+    )
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const patients = await features.query.populate({
+      path: "docteur",
+      select: "nom prenom",
+    });
+    next();
+    res.json({ patients: patients });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
-function getPatientById(req, res) {
-  patient.findById(req.params.id, function (err, patient) {
-    if (err) {
-      console.log(err);
-    } else {
-      res.json(patient);
-    }
-  });
-}
+/// get waiting patients
 
-function addPatient(req, res) {
-  let newpatient = new patient({
-    nom: req.body.nom,
-    prenom: req.body.prenom,
-    date_naissance: req.body.date_naissance,
-    telephone: req.body.telephone,
-    num_dossier: req.body.num_dossier,
-    diagnostic: req.body.diagnostic,
-    ordonnance: req.body.ordonnance,
-    evaluation: req.body.evaluation,
-    //doctorID: getAuthorizedID(req),
-  });
-  newpatient.save(function (err, patient) {
-    if (err) {
-      console.log(err);
-    } else {
-      res.json(patient);
+exports.getWaitingPatients = async (req, res, next) => {
+  try {
+    if (!req.body.docteur) req.body.docteur = req.doctor.id;
+    if (req.params.docId != req.doctor.id) {
+      return next(
+        new AppError(
+          "You are not authorized to get other doctors patients",
+          401
+        )
+      );
     }
-  });
-}
+    const features = new APIFeatures(
+      Patient.find()
+        .where("docteur")
+        .equals(req.body.docteur)
+        .or([
+          { "JADAS.state": 1 },
+          { "JSPADA.state": 1 },
+          { "JAMAR.state": 1 },
+          { "CHAQ.state": 1 },
+        ]),
+      req.query
+    )
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+
+    const patients = await features.query;
+    res.json({
+      patients: patients,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+///// adding a patient (signing him up but with not token)
+
+exports.addPatient = async (req, res, next) => {
+  try {
+    req.body.docteur = req.doctor.id;
+    if (req.params.docId != req.body.docteur) {
+      return next(
+        new AppError(
+          "You are not authorized to add other doctors patients",
+          401
+        )
+      );
+    }
+    req.body.password = String(req.body.num_dossier);
+    const newPatient = await Patient.create(req.body);
+    res.json({
+      patient: newPatient,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 /*******************evaluation-ordonnance**************/
 
-function updateOrdonnance(req, res) {
-  patient.findById(req.params.id, function (err, patient) {
-    if (err) {
-      console.log(err);
-    } else {
-      patient.ordonnance = req.body.ordonnance;
-      res.json(patient);
+exports.updateOrdonnance = async (req, res, next) => {
+  try {
+    if (req.params.docId != req.doctor.id) {
+      return next(
+        new AppError(
+          "You are not authorized to update ordonnance for other doctors patients",
+          401
+        )
+      );
     }
+    const currentPatient = await Patient.findOne({
+      _id: req.params.PId,
+      docteur: req.params.docId,
+    });
+    currentPatient.ordonnance = req.body.ordonnance;
+    await currentPatient.save();
+    res.json(currentPatient);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.updateEvaluation = async (req, res, next) => {
+  try {
+    if (req.params.docId != req.doctor.id) {
+      return next(
+        new AppError(
+          "You are not authorized to update evaluation for other doctors patients",
+          401
+        )
+      );
+    }
+    const currentPatient = await Patient.findOne({
+      _id: req.params.PId,
+      docteur: req.params.docId,
+    });
+    currentPatient.evaluation = req.body.evaluation;
+    await currentPatient.save();
+    res.json(currentPatient);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+////// asking for scores
+
+//jadas
+
+exports.askforJADAS = async (req, res, next) => {
+  if (req.params.docId != req.doctor.id) {
+    return next(
+      new AppError(
+        "You are not authorized to add ask other doctors patients for jadas",
+        401
+      )
+    );
+  }
+  const patient = await Patient.findOne({
+    _id: req.params.PId,
+    docteur: req.params.docId,
   });
-}
-
-function updateEvaluation(req, res) {
-  patient.findById(req.params.id, function (err, patient) {
-    if (err) {
-      console.log(err);
-    } else {
-      patient.evaluation = req.body.evaluation;
-      res.json(patient);
-    }
+  patient.JADAS.unshift({
+    dateDemande: new Date(),
+    state: 0,
   });
-}
+  if (patient.JADAS.length >= 6) patient.JADAS.pop();
+  await patient.save();
+  res.json({
+    patient,
+  });
+};
 
-/***************scores************/
+//jspada
 
-function askforJADAS(req, res) {
-  patient.updateOne(
-    { _id: req.params.id },
-    {
-      $push: {
-        JADAS: {
-          dateDemande: new Date(),
-          state: 0,
-        },
-      },
-    },
-    (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(patient);
-      }
-    }
-  );
-}
+exports.askforJSPADA = async (req, res, next) => {
+  if (req.params.docId != req.doctor.id) {
+    return next(
+      new AppError(
+        "You are not authorized to ask other doctors patients for JSPADA",
+        401
+      )
+    );
+  }
+  const patient = await Patient.findOne({
+    _id: req.params.PId,
+    docteur: req.params.docId,
+  });
+  patient.JSPADA.unshift({
+    dateDemande: new Date(),
+    state: 0,
+  });
+  if (patient.JSPADA.length >= 6) patient.JSPADA.pop();
+  await patient.save();
+  res.json({
+    patient,
+  });
+};
 
-function askforJSPADA(req, res) {
-  patient.updateOne(
-    { _id: req.params.id },
-    {
-      $push: {
-        JSPADA: {
-          dateDemande: req.body.dateDemande,
-          state: 0,
-        },
-      },
-    },
-    (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(patient);
-      }
-    }
-  );
-}
+// chaq
 
-function askforCHAQ(req, res) {
-  patient.updateOne(
-    { _id: req.params.id },
-    {
-      $push: {
-        CHAQ: {
-          dateDemande: req.body.dateDemande,
-          state: 0,
-        },
-      },
-    },
-    (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(patient);
-      }
-    }
-  );
-}
+exports.askforCHAQ = async (req, res, next) => {
+  if (req.params.docId != req.doctor.id) {
+    return next(
+      new AppError(
+        "You are not authorized to ask other doctors patients for CHAQ",
+        401
+      )
+    );
+  }
+  const patient = await Patient.findOne({
+    _id: req.params.PId,
+    docteur: req.params.docId,
+  });
+  patient.CHAQ.unshift({
+    dateDemande: new Date(),
+    state: 0,
+  });
+  if (patient.CHAQ.length >= 6) patient.CHAQ.pop();
+  await patient.save();
+  res.json({
+    patient,
+  });
+};
 
-function fillJADAS(req, res) {
-  patient.updateOne(
-    { _id: req.params.idp, "JADAS._id": req.params.idj },
-    {
-      $set: {
-        JADAS: {
-          score: req.body.score,
-          dateCalcul: new Date(),
-          state: 1,
-        },
-      },
-    },
-    (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(patient);
-      }
-    }
-  );
-}
+// valdating scores
 
-function fillJSPADA(req, res) {
-  patient.updateOne(
-    { _id: req.params.idp, "JSPADA._id": req.params.idj },
-    {
-      $set: {
-        JSPADA: {
-          score: req.body.score,
-          dateCalcul: new Date(),
-          state: 1,
-        },
-      },
-    },
-    (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(patient);
-      }
-    }
-  );
-}
-function fillCHAQ(req, res) {
-  patient.updateOne(
-    { _id: req.params.idp, "CHAQ._id": req.params.idj },
-    {
-      $set: {
-        CHAQ: {
-          score: req.body.score,
-          douleurs: req.body.douleurs,
-          dateCalcul: new Date(),
-          state: 1,
-        },
-      },
-    },
-    (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(patient);
-      }
-    }
-  );
-}
+//jadas
 
-function validateJADAS(req, res) {
-  patient.updateOne(
-    { _id: req.params.idp, "JADAS._id": req.params.idj },
-    {
-      $set: {
-        JADAS: {
-          dateValidation: new Date(),
-          state: 2,
-        },
-      },
-    },
-    (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(patient);
-      }
-    }
-  );
-}
+exports.validateJADAS = async (req, res, next) => {
+  if (req.params.docId != req.doctor.id) {
+    return next(
+      new AppError(
+        "You are not authorized to validate jadas for other doctors patients",
+        401
+      )
+    );
+  }
+  const patient = await Patient.findOne({
+    _id: req.params.PId,
+    docteur: req.params.docId,
+  });
+  if (!patient.JADAS[0]) {
+    return next(new AppError("pas de jadas à valider", 401));
+  }
+  patient.JADAS[0].dateValidation = new Date();
+  patient.JADAS[0].state = 2;
+  await patient.save();
+  res.json({
+    patient,
+  });
+};
 
-function validateJSPADA(req, res) {
-  patient.updateOne(
-    { _id: req.params.idp, "JSPADA._id": req.params.idj },
-    {
-      $set: {
-        JSPADA: {
-          dateValidation: new Date(),
-          state: 2,
-        },
-      },
-    },
-    (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(patient);
-      }
-    }
-  );
-}
-function validateCHAQ(req, res) {
-  patient.updateOne(
-    { _id: req.params.idp, "CHAQ._id": req.params.idj },
-    {
-      $set: {
-        CHAQ: {
-          evaluation: req.body.evaluation,
-          dateValidation: new Date(),
-          state: 2,
-        },
-      },
-    },
-    (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(patient);
-      }
-    }
-  );
-}
+//jspada
+
+exports.validateJSPADA = async (req, res, next) => {
+  if (req.params.docId != req.doctor.id) {
+    return next(
+      new AppError(
+        "You are not authorized to validate jspada for other doctors patients",
+        401
+      )
+    );
+  }
+  const patient = await Patient.findOne({
+    _id: req.params.PId,
+    docteur: req.params.docId,
+  });
+  if (!patient.JSPADA[0]) {
+    return next(new AppError("pas de jspada à valider", 401));
+  }
+  patient.JSPADA[0].dateValidation = new Date();
+  patient.JSPADA[0].state = 2;
+  await patient.save();
+  res.json({
+    patient,
+  });
+};
+
+//chaq
+
+exports.validateCHAQ = async (req, res, next) => {
+  if (req.params.docId != req.doctor.id) {
+    return next(
+      new AppError(
+        "You are not authorized to validate chaq for other doctors patients",
+        401
+      )
+    );
+  }
+  const patient = await Patient.findOne({
+    _id: req.params.PId,
+    docteur: req.params.docId,
+  });
+  if (!patient.CHAQ[0]) {
+    return next(new AppError("pas de chaq à valider", 401));
+  }
+  patient.CHAQ[0].dateValidation = new Date();
+  patient.CHAQ[0].state = 2;
+  await patient.save();
+  res.json({
+    patient,
+  });
+};
 
 /*************bilan**************/
 
-function askforBILAN(req, res) {
-  patient.updateOne(
-    { _id: req.params.id },
-    {
-      Bilan: {
-        type_bilan: req.body.type,
-        dateDemande: new Date(),
-        state: 0,
-      },
-    },
-    (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(patient);
-      }
+exports.askforBILAN = async (req, res, next) => {
+  try {
+    if (req.params.docId != req.doctor.id) {
+      return next(
+        new AppError(
+          "You are not authorized to ask other doctors patients for bilan",
+          401
+        )
+      );
     }
-  );
-}
+    const patient = await Patient.findOne({
+      _id: req.params.PId,
+      docteur: req.params.docId,
+    });
+    patient.Bilan[0] = {
+      type_bilan: req.body.type_bilan,
+      dateDemande: new Date(),
+      state: 0,
+    };
+    await patient.save();
+    res.json({ patient });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
-function validateBILAN(req, res) {
-  patient.updateOne(
-    { _id: req.params.idp, "JADAS._id": req.params.idj },
-    {
-      Bilan: {
-        dateSaisie: new Date(),
-        state: 1,
-      },
-    },
-    (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.json(patient);
-      }
-    }
-  );
-}
-
-module.exports.getPatientById = getPatientById;
-module.exports.addPatient = addPatient;
-module.exports.updateOrdonnance = updateOrdonnance;
-module.exports.fillJADAS = fillJADAS;
-module.exports.askforJADAS = askforJADAS;
-module.exports.validateJADAS = validateJADAS;
-module.exports.askforBILAN = askforBILAN;
-module.exports.validateBILAN = validateBILAN;
-module.exports.getAllPatients = getAllPatients;
-module.exports.updateEvaluation = updateEvaluation;
-module.exports.fillJSPADA = fillJSPADA;
-module.exports.askforJSPADA = askforJSPADA;
-module.exports.validateJSPADA = validateJSPADA;
-module.exports.fillCHAQ = fillCHAQ;
-module.exports.askforCHAQ = askforCHAQ;
-module.exports.validateCHAQ = validateCHAQ;
+exports.validateBILAN = async (req, res, next) => {
+  if (req.params.docId != req.doctor.id) {
+    return next(
+      new AppError(
+        "You are not authorized to validate bilan for other doctors patients",
+        401
+      )
+    );
+  }
+  try {
+    const patient = await Patient.findOne({
+      _id: req.params.PId,
+      docteur: req.params.docId,
+    });
+    patient.Bilan[0].state = 1;
+    await patient.save();
+    res.json({ patient });
+  } catch (err) {
+    console.log(err);
+  }
+};
