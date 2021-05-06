@@ -129,7 +129,6 @@ Patient.virtual("age").get(function () {
 });
 
 Patient.pre("save", async function (next) {
-  this.password = await bcrypt.hash(this.password, 20);
   next();
 });
 

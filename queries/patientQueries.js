@@ -1,6 +1,7 @@
 const Patient = require("../models/patientModel");
 const APIFeatures = require("./../utils/apiFeatures");
 const AppError = require("./../utils/appError");
+const bcrypt = require("bcryptjs");
 
 /////When signing up , the patient gets his data based on the id in the token
 
@@ -179,7 +180,7 @@ exports.addPatient = async (req, res, next) => {
         )
       );
     }
-    req.body.password = String(req.body.num_dossier);
+    req.body.password = await bcrypt.hash(String(req.body.num_dossier), 12);
     const newPatient = await Patient.create(req.body);
     res.json({
       patient: newPatient,

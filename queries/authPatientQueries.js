@@ -13,8 +13,7 @@ const signToken = (id) => {
 exports.loginPat = catchAsync(async (req, res, next) => {
   const telephone = req.body.telephone;
   const password = req.body.password;
-  const num_dossier = req.body.password;
-
+  const num_dossier = Number(req.body.password);
   // 1) Check if telephone & password exists
   if (!telephone || !password) {
     return next(new AppError("Please provide telephone && password", 400));
