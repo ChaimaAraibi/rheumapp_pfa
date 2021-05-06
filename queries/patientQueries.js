@@ -180,7 +180,7 @@ exports.addPatient = async (req, res, next) => {
         )
       );
     }
-    req.body.password = await bcrypt.hash(String(req.body.num_dossier), 12);
+    req.body.password = String(req.body.num_dossier);
     const newPatient = await Patient.create(req.body);
     res.json({
       patient: newPatient,
