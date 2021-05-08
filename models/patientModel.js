@@ -41,7 +41,7 @@ let Patient = new Schema(
     ordonnance: [
       {
         type: [String],
-        required: true,
+        //required: true,
         minItems: 0,
         maxItems: 5,
       },
