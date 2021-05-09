@@ -10,7 +10,7 @@ exports.getPatientById = async (req, res, next) => {
     if (!req.params.PId) req.params.PId = req.patient._id;
     const patient = await Patient.findById(req.params.PId).populate({
       path: "docteur",
-      select: "nom prenom",
+      select: "nom prenom mail telephone",
     });
     res.json({
       patient,
@@ -119,7 +119,7 @@ exports.getAllPatients = async (req, res, next) => {
       .paginate();
     const patients = await features.query.populate({
       path: "docteur",
-      select: "nom prenom",
+      select: "nom prenom mail telephone",
     });
     next();
     res.json({ patients: patients });
@@ -158,7 +158,10 @@ exports.getWaitingPatients = async (req, res, next) => {
       .limitFields()
       .paginate();
 
-    const patients = await features.query;
+    const patients = await features.querypopulate({
+      path: "docteur",
+      select: "nom prenom mail telephone",
+    });
     res.json({
       patients: patients,
     });
