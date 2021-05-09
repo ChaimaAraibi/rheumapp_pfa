@@ -158,7 +158,7 @@ exports.getWaitingPatients = async (req, res, next) => {
       .limitFields()
       .paginate();
 
-    const patients = await features.querypopulate({
+    const patients = await features.query.populate({
       path: "docteur",
       select: "nom prenom mail telephone",
     });
