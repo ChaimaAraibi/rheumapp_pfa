@@ -4,11 +4,23 @@ const patientRoutes = require("./routes/patientRoutes");
 const doctorRoutes = require("./routes/doctorRoutes");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const helmet = require("helmet");
+const mongoSanitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
 dotenv.config({ path: "./config.env" });
+
+app.use(helmet());
 
 const PORT = 4000;
 app.use(cors());
 app.use(express.json());
+
+// contre Nosql injection
+app.use(mongoSanitize());
+
+// contre cross-site-scripting
+app.use(xss());
+
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   next();
@@ -27,6 +39,7 @@ mongoose
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      useCreateIndex: true,
     }
   )
   .then(
@@ -39,5 +52,3 @@ mongoose
   );
 app.use("/patients", patientRoutes);
 app.use("/doctors", doctorRoutes);
-
-
