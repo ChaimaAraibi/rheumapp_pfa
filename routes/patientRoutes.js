@@ -74,6 +74,11 @@ patientRoutes
   .route("/:PId/validJADAS")
   .post(authDoctorQueries.protectDoc, patientQueries.validateJADAS);
 
+/// delete a jadas
+patientRoutes
+  .route("/:PId/deleteJADAS")
+  .delete(authDoctorQueries.protectDoc, patientQueries.deleteJADAS);
+
 /// ask for a jspada
 
 patientRoutes
@@ -86,6 +91,11 @@ patientRoutes
   .route("/:PId/validJSPADA")
   .post(authDoctorQueries.protectDoc, patientQueries.validateJSPADA);
 
+/// delete a jspada
+patientRoutes
+  .route("/:PId/deleteJSPADA")
+  .delete(authDoctorQueries.protectDoc, patientQueries.deleteJSPADA);
+
 /// ask for a chaq
 
 patientRoutes
@@ -97,6 +107,11 @@ patientRoutes
 patientRoutes
   .route("/:PId/validCHAQ")
   .post(authDoctorQueries.protectDoc, patientQueries.validateCHAQ);
+
+/// delete a jspada
+patientRoutes
+  .route("/:PId/deleteCHAQ")
+  .delete(authDoctorQueries.protectDoc, patientQueries.deleteCHAQ);
 
 ///// ask for bilan
 

@@ -55,6 +55,7 @@ const doctorSchema = new mongoose.Schema({
     },
     message: "Passwords are not the same",
   },
+  //for future use
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,

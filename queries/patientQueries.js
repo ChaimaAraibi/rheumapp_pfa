@@ -448,3 +448,71 @@ exports.validateBILAN = async (req, res, next) => {
     console.log(err);
   }
 };
+
+//////Delete score
+
+//jadas
+
+exports.deleteJADAS = async (req, res, next) => {
+  if (req.params.docId != req.doctor.id) {
+    return next(
+      new AppError(
+        "You are not authorized to add ask other doctors patients for jadas",
+        401
+      )
+    );
+  }
+  const patient = await Patient.findOne({
+    _id: req.params.PId,
+    docteur: req.params.docId,
+  });
+  patient.JADAS.shift();
+  await patient.save();
+  res.json({
+    data: null,
+  });
+};
+
+//jspada
+
+exports.deleteJSPADA = async (req, res, next) => {
+  if (req.params.docId != req.doctor.id) {
+    return next(
+      new AppError(
+        "You are not authorized to ask other doctors patients for JSPADA",
+        401
+      )
+    );
+  }
+  const patient = await Patient.findOne({
+    _id: req.params.PId,
+    docteur: req.params.docId,
+  });
+  patient.JSPADA.shift();
+  await patient.save();
+  res.json({
+    data: null,
+  });
+};
+
+// chaq
+
+exports.deleteCHAQ = async (req, res, next) => {
+  if (req.params.docId != req.doctor.id) {
+    return next(
+      new AppError(
+        "You are not authorized to ask other doctors patients for CHAQ",
+        401
+      )
+    );
+  }
+  const patient = await Patient.findOne({
+    _id: req.params.PId,
+    docteur: req.params.docId,
+  });
+  patient.CHAQ.shift();
+  await patient.save();
+  res.json({
+    data: null,
+  });
+};
